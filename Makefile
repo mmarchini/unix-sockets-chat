@@ -8,6 +8,7 @@ SRC_FOLDER = src
 SRC_FILES  := ${foreach file, $(UTIL_FILES),$(SRC_FOLDER)/$(file).c}
 BIN_FOLDER = bin
 
+
 SERVER_BIN = server
 CLIENT_BIN = client
 
