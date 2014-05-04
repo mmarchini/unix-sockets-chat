@@ -5,8 +5,9 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "messages.h"
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE sizeof(Message) 
 
 #define true  1
 #define false 0

@@ -2,32 +2,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include "connection.h"
+#include "messages.h"
+#include "util.h"
 
 #define PORT 4000
 
 int main(int argc, char *argv[])
 {
     int n;
-    char buffer[256];
+    Message message;
 
     Connection *connection = NULL;
     
-    if (argc < 2) {
-        fprintf(stderr,"usage %s hostname\n", argv[0]);
+    if (argc < 3) {
+        fprintf(stderr,"usage %s hostname username\n", argv[0]);
         exit(0);
     }
 
     connection = connectToServer(argv[1], PORT);
-    while(true){
-     
-        printf("Enter the message: ");
-        bzero(buffer, 256);
-        fgets(buffer, 256, stdin);
 
-        writeTo(connection, buffer, strlen(buffer));
+    strcpy(message.sender, argv[2]);
+
+    while(true){
+
+        printf("%s: ", message.sender);
+        bzero((char *)&message, BUFFER_SIZE);
+        fgets(message.message, MESSAGE_SIZE, stdin);
+        strcpy(message.sender, argv[2]);
+        message.timestamp = timestamp();
+
+        writeTo(connection, (char *)&message, BUFFER_SIZE);
         
-        readFrom(connection);
-        printf("%s\n",connection->buffer);
+//      readFrom(connection);
+
+//      printf("%s\n",connection->buffer);
     }
 
     

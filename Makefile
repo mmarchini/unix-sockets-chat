@@ -1,7 +1,7 @@
 
-UTIL_FILES = messages connection
+UTIL_FILES = messages connection util
 CC = gcc
-CC_FLAGS = -Iinclude -lpthread
+CC_FLAGS = -Iinclude -lpthread -g
 OBJ_FOLDER = obj
 OBJ_FILES  := ${foreach file, $(UTIL_FILES),$(OBJ_FOLDER)/$(file).o}
 SRC_FOLDER = src

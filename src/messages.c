@@ -16,8 +16,6 @@ Message *MessageCreate(char *message, char *sender, time_t timestamp) {
 }
 
 void MessageDestroy(Message *message) {
-    free(message->message);
-    free(message->sender);
     free(message);
 }
 

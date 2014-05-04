@@ -4,9 +4,6 @@
 #include <string.h>
 #include <netdb.h> 
 
-#define true  1
-#define false 0
-
 Connection *openServer(int port) {
     Connection *connection = calloc(1, sizeof(Connection));
     

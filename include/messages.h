@@ -3,15 +3,18 @@
 #include <pthread.h>
 #include <time.h>
 
+#define MESSAGE_SIZE 256
+#define USERNAME_SIZE 16
+
 /*
  * Message
  */
 
 typedef struct _Message {
-    char *message;
-    char *sender;
+    char message[MESSAGE_SIZE];
+    char sender[USERNAME_SIZE];
     time_t timestamp;
-}Message;
+} Message;
 
 Message *MessageCreate(char *message, char *sender, time_t timestamp);
 

@@ -2,18 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include "connection.h"
-
-#define PORT 4000
+#include "connection.h"  
+#include "messages.h"
+                         
+#define PORT 4000        
 
 void *clientHandler(void *args){
     Connection *client = (Connection *)args;
+    Message message;
+    char time[256];
     while(true){
         readFrom(client);
+        memcpy((char *)&message, client->buffer, sizeof(Message));
+        bzero(time, 256);
+        strftime(time, 256, "%d/%m/%Y %H:%M", localtime(&message.timestamp));
 
-        printf("Here is the message: %s\n", client->buffer);
-        
-        writeTo(client, "I got your message", 18);
+        printf("%s[%s]: %s\n", message.sender, time, message.message);
     }
 }
 
