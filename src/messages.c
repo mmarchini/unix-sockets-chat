@@ -2,14 +2,30 @@
 #include <stdlib.h>
 #include <string.h>
 
-int MessagesInit(Messages *messages) {
-    pthread_mutex_init(&(messages->crit_region), NULL);
-    messages->fifo = NULL;
+/*
+ * Messages Methods
+ */
 
-    return 0;
+Message *MessageCreate(char *message, char *sender, time_t timestamp) {
+    Message *new_message    = calloc(1, sizeof(Message));
+    strcpy(new_message->message, message);
+    strcpy(new_message->sender,  sender);
+    new_message->timestamp  = timestamp;
+
+    return new_message;
 }
 
-MessageFIFO *MessageFIFOCreate(char *message) {
+void MessageDestroy(Message *message) {
+    free(message->message);
+    free(message->sender);
+    free(message);
+}
+
+/*
+ * Messages FIFO Methods
+ */
+
+MessageFIFO *MessageFIFOCreate(Message *message) {
     MessageFIFO *fifo =  calloc(1, sizeof(MessageFIFO));
     fifo->message = message;
     fifo->next = NULL;
@@ -17,34 +33,52 @@ MessageFIFO *MessageFIFOCreate(char *message) {
     return fifo;
 }
 
-int MessagesInsert(Messages *messages, char *message) {
+/*
+ * Messages Queue Methods
+ */
+
+int MessagesQueueInit(MessagesQueue *messages) {
+    pthread_mutex_init(&(messages->crit_region), NULL);
+    messages->fifo = NULL;
+
+    return 0;
+}
+int MessagesQueueInsert(MessagesQueue *messages, Message *message) {
     MessageFIFO *fifo;
+    MessageFIFO *temp;
 
     pthread_mutex_lock(&(messages->crit_region));
        if(messages->fifo == NULL) {
            messages->fifo = MessageFIFOCreate(message);
        } else {
-            for(fifo = messages->fifo;fifo->next != NULL;fifo = fifo->next);
-            fifo->next = MessageFIFOCreate(message);
+            for(fifo = messages->fifo;fifo->next != NULL || fifo->message->timestamp <= message->timestamp;fifo = fifo->next);
+            if(fifo->next == NULL){
+                fifo->next = MessageFIFOCreate(message);
+            }
+            else {
+                temp = fifo->next;
+                fifo->next = MessageFIFOCreate(message);
+                fifo->next->next=temp;
+            }
        }
     pthread_mutex_unlock(&(messages->crit_region));
 
     return 0;
 }
 
-char *MessagesRetrieve(Messages *messages) {
+Message *MessagesQueueRetrieve(MessagesQueue *messages) {
     MessageFIFO *fifo;
-    char *message;
+    Message *message;
 
     pthread_mutex_lock(&(messages->crit_region));
        if(messages->fifo == NULL) {
            message = NULL;
        } else {
-           message = calloc(strlen(messages->fifo->message), sizeof(char));
-           strcpy(message, messages->fifo->message);
+           message = calloc(1, sizeof(Message));
+           memcpy(message, messages->fifo->message, sizeof(Message));
            fifo = messages->fifo;
            messages->fifo = fifo->next;
-           free(fifo->message);
+           MessageDestroy(fifo->message);
            free(fifo);
        }
     pthread_mutex_unlock(&(messages->crit_region));
@@ -52,11 +86,11 @@ char *MessagesRetrieve(Messages *messages) {
     return message;
 }
 
-int MessagesDestroy(Messages *messages) {
+int MessagesQueueDestroy(MessagesQueue *messages) {
     MessageFIFO *fifo;
     
     for(fifo = messages->fifo;fifo != NULL;fifo = fifo->next){
-        free(fifo->message);
+        MessageDestroy(fifo->message);
         free(fifo);
     }
     free(messages);

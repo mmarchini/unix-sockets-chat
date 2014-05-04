@@ -1,23 +1,46 @@
 #ifndef _MESSAGES_H
 #define _MESSAGES_H
 #include <pthread.h>
+#include <time.h>
+
+/*
+ * Message
+ */
+
+typedef struct _Message {
+    char *message;
+    char *sender;
+    time_t timestamp;
+}Message;
+
+Message *MessageCreate(char *message, char *sender, time_t timestamp);
+
+void MessageDestroy(Message *message);
+
+/*
+ * MessageFIFO
+ */
 
 typedef struct _MessageFIFO {
-    char *message;
+    Message *message;
     struct _MessageFIFO *next;
 } MessageFIFO;
 
-typedef struct _Messages{
+/*
+ * MessageQueue
+ */
+
+typedef struct _MessagesQueue{
     pthread_mutex_t crit_region;
     MessageFIFO *fifo;
-} Messages;
+} MessagesQueue;
 
-int MessagesInit(Messages *messages);
+int MessagesQueueInit(MessagesQueue *messages);
 
-int MessagesInsert(Messages *messages, char *message);
+int MessagesQueueInsert(MessagesQueue *messages, Message *message);
 
-char *MessagesRetrieve(Messages *messages);
+Message *MessagesQueueRetrieve(MessagesQueue *messages);
 
-int MessagesDestroy(Messages *messages);
+int MessagesQueueDestroy(MessagesQueue *messages);
 
 #endif
