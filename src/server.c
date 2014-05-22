@@ -7,7 +7,7 @@
                          
 #define PORT 4000        
 
-void *clientHandler(void *args){
+void *clientReciever(void *args){
     Connection *client = (Connection *)args;
     Message message;
     char time[256];
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
     while(true){
         client_conn = acceptConnection(connection);
-        pthread_create(&token, NULL, &clientHandler, (void *) client_conn);
+        pthread_create(&token, NULL, &clientReciever, (void *) client_conn);
     }
     readFrom(client_conn);
 
