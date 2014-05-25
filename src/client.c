@@ -41,7 +41,7 @@ void *handleRecieveMessages(void *args){
 
     while(running){
     	message = readFrom(connection);
-    	if(message != NULL && connection->is_active){
+    	if((message != NULL) && (connection->is_active)){
 			bzero(time, 256);
 			strftime(time, 256, "%d/%m/%Y %H:%M", localtime(&message->timestamp));
 

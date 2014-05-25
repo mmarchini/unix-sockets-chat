@@ -50,6 +50,10 @@ void *connection_handleRecievedMessages(void *args){
 			printf("ERROR reading from socket\n");
 			connection->is_active = False;
 			return NULL;
+		} else if( n == 0) {
+			printf("Connection Closed\n");
+			connection->is_active = False;
+			return NULL;
 		}
 		else {
 			MessagesQueueInsert(&(connection->_in_buffer), (Message *)buffer);
@@ -81,6 +85,10 @@ void *connection_handleSentMessages(void *args){
 		if (n < 0) {
 			connection->is_active = False;
 			printf("ERROR reading from socket\n");
+			return NULL;
+		} else if( n == 0) {
+			printf("Connection Closed\n");
+			connection->is_active = False;
 			return NULL;
 		}
 		MessageDestroy(message);
