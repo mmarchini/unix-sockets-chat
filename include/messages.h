@@ -2,9 +2,7 @@
 #define _MESSAGES_H
 #include <pthread.h>
 #include <time.h>
-
-#define MESSAGE_SIZE 256
-#define USERNAME_SIZE 16
+#include "constants.h"
 
 /*
  * Message
@@ -12,11 +10,13 @@
 
 typedef struct _Message {
     char message[MESSAGE_SIZE];
-    char sender[USERNAME_SIZE];
+    char sender_name[USERNAME_SIZE];
+    int sender_id;
+    char room[ROOM_SIZE];
     time_t timestamp;
 } Message;
 
-Message *MessageCreate(char *message, char *sender, time_t timestamp);
+Message *MessageCreate(char *message, char *sender_name, int sender_id, time_t timestamp);
 
 void MessageDestroy(Message *message);
 

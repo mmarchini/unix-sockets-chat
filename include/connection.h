@@ -6,16 +6,18 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "messages.h"
+#include "util.h"
 
-#define BUFFER_SIZE sizeof(Message) 
-
-#define true  1
-#define false 0
+#define BUFFER_SIZE sizeof(Message)
 
 typedef struct _Connection {
     int sockid;
-    char buffer[BUFFER_SIZE];
     struct sockaddr_in addr;
+
+    bool is_active;
+
+    MessagesQueue _in_buffer;
+    MessagesQueue _out_buffer;
 } Connection;
 
 Connection *openServer(int port);
@@ -24,8 +26,8 @@ Connection *connectToServer(char *hostname, int port);
 
 Connection *acceptConnection(Connection *connection); 
 
-void readFrom(Connection *remote);
+Message *readFrom(Connection *remote);
 
-void writeTo(Connection *remote, char *msg, int len);
+int writeTo(Connection *remote, Message *message);
 
 #endif
