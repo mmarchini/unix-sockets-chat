@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <signal.h>
 #include "connection.h"  
 #include "messages.h"
 #include "util.h"
@@ -66,7 +67,6 @@ void *serverStartUser(void *args){
 	Connection *client_conn = (Connection *)args;
 	pthread_t sender, reciever;
 	Message *message;
-    User *user;
     int id;
     void *return_token;
 
@@ -104,7 +104,7 @@ void *serverStartUser(void *args){
 	pthread_join(reciever, &return_token);
 
     CRITICAL_REGION_BEGIN(user_list_lock) {
-    	userDestroy(user);
+    	userDestroy(users_list[id]);
         users_list[id]=NULL;
     } CRITICAL_REGION_END(user_list_lock)
 
@@ -118,6 +118,8 @@ int startServer(int port) {
 
     int i;
     bool whilecond = True;
+
+    signal(SIGPIPE, SIG_IGN);
 
     pthread_mutex_init(&user_list_lock, PTHREAD_MUTEX_DEFAULT);
 
