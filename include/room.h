@@ -2,28 +2,24 @@
 #define _ROOM_H
 
 #include <pthread.h>
+#include "user.h"
 #include "messages.h"
 
 typedef struct _Room{
     char name[ROOM_NAME_SIZE];
-    MessagesQueue queue;
-    Message current_messages;
-    int current_clients;
-    int released_clients;
-    pthread_mutex_t crit_region;
-    pthread_cond_t available_message;
+    User *users[ROOM_SIZE];
+
+    pthread_mutex_t mutex;
 } Room;
 
 Room *roomCreate(char *name);
 
-Room *roomSignalMessage();
+void roomSendMessage(Room *room, Message *message);
 
-Room *roomReadMessage();
+Room *roomJoin(Room *room, User *user);
 
-Room *roomWaitMessage();
+Room *roomLeave(Room *room, User *user);
 
-Room *roomJoin();
-
-Room *roomLeave();
+void roomDestroy(Room *room);
 
 #endif

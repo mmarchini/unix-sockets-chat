@@ -5,8 +5,8 @@
 
 // Macros to lock/unlock mutex
 // This gives the impresson that a block of code between BEGIN/END is atomic.
-#define CRITICAL_REGION_BEGIN(mutex) { pthread_mutex_lock(&mutex);
-#define CRITICAL_REGION_END(mutex) pthread_mutex_unlock(&mutex); }
+#define CRITICAL_REGION_BEGIN(mutex) { pthread_mutex_lock(&(mutex));
+#define CRITICAL_REGION_END(mutex) pthread_mutex_unlock(&(mutex)); }
 
 typedef enum {
 	True = 1,

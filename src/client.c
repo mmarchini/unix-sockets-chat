@@ -8,6 +8,7 @@
 #include "constants.h"
 
 int user_id;
+int room_id;
 
 void *handleSentMessages(void *args){
     Connection *connection = (Connection *)args;

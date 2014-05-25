@@ -1,5 +1,5 @@
 
-LIB_FILES = messages connection util server client user
+LIB_FILES = messages connection util server client user room
 CC = gcc
 CC_FLAGS = -Iinclude -lpthread -g
 OBJ_FOLDER = obj

@@ -8,6 +8,7 @@ User *userCreate(int id, char *name, Connection *connection){
 	user->id = id;
 	strncpy(user->name, name, USERNAME_SIZE);
 	user->connection = connection;
+	user->room_id = NO_ROOM;
 
 	return user;
 }

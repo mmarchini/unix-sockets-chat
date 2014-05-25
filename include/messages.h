@@ -12,7 +12,7 @@ typedef struct _Message {
     char message[MESSAGE_SIZE];
     char sender_name[USERNAME_SIZE];
     int sender_id;
-    char room[ROOM_SIZE];
+    int room_id;
     time_t timestamp;
 } Message;
 

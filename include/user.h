@@ -5,13 +5,10 @@
 #include "connection.h"
 #include "constants.h"
 
-#define JOIN_COMMAND "\\join"
-#define LEAVE_COMMAND "\\leave"
-#define RENAME_COMMAND "\\rename"
-
 typedef struct _User{
 	int id;
     char name[USERNAME_SIZE];
+    int room_id;
     Connection *connection;
 } User;
 

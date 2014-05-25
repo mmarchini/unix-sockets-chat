@@ -6,6 +6,9 @@
 
 #define ROOM_SIZE 64
 #define MAX_CONNECTED_USERS 256
+#define MAX_SIMULTANEOUS_ROOMS 16
+
+#define NO_ROOM -1
 
 #define MESSAGE_SIZE 256
 

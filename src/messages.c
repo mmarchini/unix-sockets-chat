@@ -13,6 +13,7 @@ Message *MessageCreate(char *message, char *sender_name, int sender_id, time_t t
     strcpy(new_message->sender_name,  sender_name);
     new_message->sender_id = sender_id;
     new_message->timestamp  = timestamp;
+    new_message->room_id = NO_ROOM;
 
     return new_message;
 }
