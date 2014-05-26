@@ -8,10 +8,19 @@
 #define CRITICAL_REGION_BEGIN(mutex) { pthread_mutex_lock(&(mutex));
 #define CRITICAL_REGION_END(mutex) pthread_mutex_unlock(&(mutex)); }
 
+#ifndef bool
+
 typedef enum {
 	True = 1,
 	False = 0
 } bool;
+
+#else
+
+#define True 1
+#define False 0
+
+#endif
 
 time_t timestamp(); 
 

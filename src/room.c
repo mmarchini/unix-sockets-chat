@@ -32,14 +32,16 @@ Room *roomJoin(Room *room, User *user){
 			if(room->users[i] == user)
 				not_found = False;
 		}
-		if(room->users[i] != user){
+
+		if(not_found){
 			for(i=0; i<ROOM_SIZE && not_found; i++){
 				if(room->users[i]==NULL)
 					not_found = False;
 			}
-			if(i>=ROOM_SIZE){
-
+			if(not_found){
+				MessageCreate("Room is full!", "*System*", -1, timestamp());
 			} else {
+				i--;
 				room->users[i] = user;
 			}
 		}
@@ -62,19 +64,23 @@ Room *roomLeave(Room *room, User *user){
 			if(room->users[i] == user)
 				not_found = False;
 		}
-		if(room->users[i] == user)
+		if(!not_found){
+			i--;
 			room->users[i] = NULL;
+		}
 
+
+		not_found=True;
 		for(i=0; i<ROOM_SIZE && not_found; i++){
 			if(room->users[i] != NULL)
 				not_found = False;
 		}
 	} CRITICAL_REGION_END(room->mutex)
-	if(i>=ROOM_SIZE){
+	if(not_found){
+		printf("Destroying room '%s'", room->name);
 		roomDestroy(room);
 		return NULL;
 	}
-
 
 	return room;
 }

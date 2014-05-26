@@ -1,7 +1,7 @@
 
 LIB_FILES = messages connection util server client user room
 CC = gcc
-CC_FLAGS = -Iinclude -lpthread -g
+CC_FLAGS = -Iinclude -lpthread -g -lncurses 
 OBJ_FOLDER = obj
 OBJ_FILES  := ${foreach file, $(LIB_FILES),$(OBJ_FOLDER)/$(file).o}
 SRC_FOLDER = src

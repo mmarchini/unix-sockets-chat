@@ -14,6 +14,8 @@
 #define JOIN_COMMAND "\\join"
 #define LEAVE_COMMAND "\\leave"
 #define RENAME_COMMAND "\\name"
+#define ROOMS_COMMAND "\\rooms"
+#define USERS_COMMAND "\\users"
 #define EXIT_COMMAND "\\exit"
 
 pthread_mutex_t user_list_lock;
@@ -24,9 +26,10 @@ Room *rooms_list[MAX_SIMULTANEOUS_ROOMS];
 
 void clientExecuteCommand(User *user, Message *message){
 	Message *msg = NULL;
-	int room_id;
+	int room_id, user_id;
 	char *token = NULL;
 	char token2[MESSAGE_SIZE];
+	char token3[MESSAGE_SIZE];
 	bool not_found = True;
 
 	token = strtok(message->message, " ");
@@ -46,10 +49,10 @@ void clientExecuteCommand(User *user, Message *message){
 				rooms_list[room_id] = roomJoin(rooms_list[room_id], user);
 				user->room_id = room_id;
 
-				sprintf(token2, "Joining room %s [%d]\n", token, room_id);
+				sprintf(token2, "Joining room %s [%d]", token, room_id);
 				msg = MessageCreate(token2, "*System*", -1, timestamp());
 			} else{
-				msg = MessageCreate("Room not found\n", "*System*", -1, timestamp());
+				msg = MessageCreate("Room not found", "*System*", -1, timestamp());
 			}
 		} CRITICAL_REGION_END(room_list_lock)
 
@@ -62,7 +65,7 @@ void clientExecuteCommand(User *user, Message *message){
 						not_found = False;
 			}
 			if(not_found == False){
-				msg = MessageCreate("A room with this name already exists\n", "*System*", -1, timestamp());
+				msg = MessageCreate("A room with this name already exists", "*System*", -1, timestamp());
 			} else {
 				not_found = True;
 				for(room_id=0;room_id<MAX_SIMULTANEOUS_ROOMS && not_found;room_id++){
@@ -71,7 +74,7 @@ void clientExecuteCommand(User *user, Message *message){
 				}
 
 				if(not_found){
-					msg = MessageCreate("Can't create more rooms!\n", "*System*", -1, timestamp());
+					msg = MessageCreate("Can't create more rooms!", "*System*", -1, timestamp());
 				} else  {
 					room_id--;
 					if(user->room_id != NO_ROOM)
@@ -79,7 +82,7 @@ void clientExecuteCommand(User *user, Message *message){
 					rooms_list[room_id] = roomCreate(token);
 					rooms_list[room_id] = roomJoin(rooms_list[room_id], user);
 					user->room_id = room_id;
-					sprintf(token2, "Creating room %s [%d]\n", token, room_id);
+					sprintf(token2, "Creating room %s [%d]", token, room_id);
 					msg = MessageCreate(token2, "*System*", -1, timestamp());
 				}
 			}
@@ -95,16 +98,43 @@ void clientExecuteCommand(User *user, Message *message){
 		} else if(!strcmp(token, LEAVE_COMMAND)) {
 			CRITICAL_REGION_BEGIN(room_list_lock) {
 				if(user->room_id != NO_ROOM){
-					sprintf(token2, "Leaving room %s [%d]\n", rooms_list[user->room_id]->name, user->room_id);
+					sprintf(token2, "Leaving room %s [%d]", rooms_list[user->room_id]->name, user->room_id);
 					msg = MessageCreate(token2, "*System*", -1, timestamp());
 					rooms_list[user->room_id] = roomLeave(rooms_list[user->room_id], user);
 				} else{
-					msg = MessageCreate("Error trying to leave room\n", "*System*", -1, timestamp());
+					msg = MessageCreate("Error trying to leave room", "*System*", -1, timestamp());
 				}
+			} CRITICAL_REGION_END(room_list_lock)
+		} else if(!strcmp(token, ROOMS_COMMAND)) {
+			CRITICAL_REGION_BEGIN(room_list_lock) {
+				bzero(token2, MESSAGE_SIZE);
+				bzero(token3, MESSAGE_SIZE);
+				for(room_id=0;room_id<MAX_SIMULTANEOUS_ROOMS;room_id++){
+					if(rooms_list[room_id]!=NULL){
+						sprintf(token2, "%s '%s'", token3, rooms_list[room_id]->name);
+						sprintf(token3, "%s", token2);
+					}
+				}
+				sprintf(token3, "Rooms list:%s", token2);
+				msg = MessageCreate(token3, "*System*", -1, timestamp());
+			} CRITICAL_REGION_END(room_list_lock)
+		} else if(!strcmp(token, USERS_COMMAND)) {
+			CRITICAL_REGION_BEGIN(room_list_lock) {
+				bzero(token2, MESSAGE_SIZE);
+				bzero(token3, MESSAGE_SIZE);
+				for(user_id=0;user_id<ROOM_SIZE;user_id++){
+					if(rooms_list[user->room_id]->users[user_id]!=NULL){
+						sprintf(token2, "%s '%s'", token3, rooms_list[user->room_id]->users[user_id]->name);
+						sprintf(token3, "%s", token2);
+					}
+
+				}
+				sprintf(token3, "Users in room:%s", token2);
+				msg = MessageCreate(token3, "*System*", -1, timestamp());
 			} CRITICAL_REGION_END(room_list_lock)
 		}
 		else{
-			msg = MessageCreate("Invalid command\n", "*System*", -1, timestamp());
+			msg = MessageCreate("Invalid command", "*System*", -1, timestamp());
 		}
 	}
 
