@@ -18,20 +18,21 @@ all: $(SERVER_BIN) $(CLIENT_BIN)
 $(SERVER_BIN): $(OBJ_FILES) 
 	@echo "Compiling $(SERVER_BIN)"
 	@mkdir -p $(BIN_FOLDER)
-	@$(CC) $(CC_FLAGS) -c $(SRC_FOLDER)/main_$(SERVER_BIN).c -o $(OBJ_FOLDER)/main_$(SERVER_BIN).o
-	@$(CC) $(CC_FLAGS) $(OBJ_FILES) $(OBJ_FOLDER)/main_$(SERVER_BIN).o -o $(BIN_FOLDER)/$(SERVER_BIN)
+	@$(CC) -c $(SRC_FOLDER)/main_$(SERVER_BIN).c -o $(OBJ_FOLDER)/main_$(SERVER_BIN).o $(CC_FLAGS)
+	@$(CC) $(OBJ_FILES) $(OBJ_FOLDER)/main_$(SERVER_BIN).o -o $(BIN_FOLDER)/$(SERVER_BIN) $(CC_FLAGS)
 
 $(CLIENT_BIN): $(OBJ_FILES)
 	@echo "Compiling $(CLIENT_BIN)"
 	@mkdir -p $(BIN_FOLDER)
-	@$(CC) $(CC_FLAGS) -c $(SRC_FOLDER)/main_$(CLIENT_BIN).c -o $(OBJ_FOLDER)/main_$(CLIENT_BIN).o
-	@$(CC) $(CC_FLAGS) $(OBJ_FILES) $(OBJ_FOLDER)/main_$(CLIENT_BIN).o -o $(BIN_FOLDER)/$(CLIENT_BIN)
+	@$(CC) -c $(SRC_FOLDER)/main_$(CLIENT_BIN).c -o $(OBJ_FOLDER)/main_$(CLIENT_BIN).o $(CC_FLAGS)
+	@$(CC) $(OBJ_FILES) $(OBJ_FOLDER)/main_$(CLIENT_BIN).o -o $(BIN_FOLDER)/$(CLIENT_BIN) $(CC_FLAGS)
 
 $(OBJ_FILES): $(SRC_FILES)
 	${eval curfile=${subst .o,.c,${subst obj,src,$@}}}
 	@echo "Compiling $(curfile) into $@"
 	@mkdir -p $(OBJ_FOLDER) 
-	@$(CC) $(CC_FLAGS) -c $(curfile) -o $@
+	@$(CC) -c $(curfile) -o $@ $(CC_FLAGS)
 
 clean:
 	rm -rf obj bin
+
