@@ -156,12 +156,6 @@ void clientHandleMessage(User *user, Message *message){
         	CRITICAL_REGION_BEGIN(room_list_lock){
         		roomSendMessage(rooms_list[user->room_id], message);
         	} CRITICAL_REGION_END(room_list_lock)
-
-
-        /*for(i=0; i<MAX_CONNECTED_USERS; i++){
-        	if(users_list[i]!=NULL)
-        		writeTo(users_list[i]->connection, message);
-        }*/
     } CRITICAL_REGION_END(user_list_lock)
 
 	printf("%s (%d) [%s]: %s\n", message->sender_name, message->room_id, time, message->message);
@@ -219,8 +213,10 @@ void *serverStartUser(void *args){
     		users_list[id]=userCreate(id, message->sender_name, client_conn);
     } CRITICAL_REGION_END(user_list_lock)
 
-    if(id>=MAX_CONNECTED_USERS)
-    	return NULL;
+    if(id>=MAX_CONNECTED_USERS){
+        client_conn->is_active=False;
+        return NULL;
+    }
 
     // Send User ID to Client
     message->sender_id = id;
